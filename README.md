@@ -1,31 +1,20 @@
-# RAG_pipeline
-A self-made RAG BOT to answer car rental questions.
+## RAG Pipeline for Car Rental Information
 
-Objective:
-Answer questions from car rental T&C.  You can also ingest other document as well.
+### 1. Objective
+This notebook demonstrates a Retrieval Augmented Generation (RAG) pipeline designed to answer questions based on information extracted from a Car Rental Information HTML document. It uses LangChain, HuggingFace models (for embeddings and generation), and FAISS for vector storage.
 
-How to use it:
-1. Copy to colab
-2. Put the source file in proper folder.
-3. Find the variable 'query', and change the query content.  Such as query = " I just booked and want to cancel, can I get a refund?"
-4. Run the code
+### 2. How to Use
+1.  **Install Libraries**: Run the first code cell to install all necessary Python packages.
+2.  **Mount Google Drive & Specify File Path**: Ensure your Google Drive is mounted and update the `file_path` variable in the 'FILE INGESTION' section to point to your `Sixt Rental Information France.html` file.
+3.  **Run All Cells**: Execute all code cells sequentially from top to bottom.
+4.  **Query the Model**: Modify the `query` variable in the 'Final Question and Answer' section and run the cell to get answers from the RAG pipeline.
 
-Program Summary
-1. Library Installation: The initial cells install necessary Python libraries like langchain, pypdf, sentence-transformers, faiss-cpu, transformers, beautifulsoup4, pandas, html5lib, accelerate, bitsandbytes, and torch.
-
-2. HTML Document Ingestion: The notebook then mounts Google Drive and loads an HTML file named Sixt Rental Information France.html from a specified path. This HTML content is stored in the html_content variable.
-
-3. HTML Parsing and Linearization: A custom function parse_html_for_rag uses BeautifulSoup to parse the HTML. It extracts headings, paragraphs, and tables, converting the tables into Markdown format. This process cleans and structures the raw HTML into a more readable, linearized text format, stored in cleaned_rag_text.
-
-4. Chunking and Document Creation: The cleaned_rag_text is converted into a LangChain Document. A RecursiveCharacterTextSplitter then divides this document into smaller, overlapping chunks (final_chunks) suitable for embedding and retrieval. This ensures that context is maintained across chunk boundaries.
-
-5. Embedding and Vector Store Creation: An open-source embedding model (BAAI/bge-small-en-v1.5) is used to convert these text chunks into numerical vectors (embeddings). These embeddings are then stored in a FAISS vector store, which is an efficient library for similarity search in high-dimensional spaces.
-
-6. Retrieval: A retriever is configured from the FAISS vector store to fetch the top 10 most relevant chunks based on a given query.
-
-7. RAG Pipeline with two LLM Models: Two different Language Models (LLMs) are used to demonstrate the RAG pipeline:
--Model 1 (google/flan-t5-small): A HuggingFacePipeline is set up with this smaller, text-to-text generation model. A ChatPromptTemplate is used to combine the retrieved context with the user's question, and the LLM generates an answer.
--Model 2 (meta-llama/Meta-Llama-3-8B-Instruct): This model is loaded with 4-bit quantization using BitsAndBytesConfig to allow it to run on environments like Colab with limited GPU memory. A similar HuggingFacePipeline and RAG chain are constructed to answer the user's question, with an added instruction to quote the section title where the answer is found. Hugging Face authentication is also included for accessing gated models.
-
-
-Overall, the code sets up a complete RAG system that can ingest an HTML document, process it, create a searchable index, and answer questions using the indexed content with different large language models.
+### 3. Code Structure
+The notebook is organized into the following key sections:
+*   **Library Installation**: Installs `langchain`, `pypdf`, `sentence-transformers`, `faiss-cpu`, `transformers`, etc.
+*   **File Ingestion**: Mounts Google Drive and reads the specified HTML document.
+*   **HTML Parsing and Text Linearization**: Converts the HTML content into a structured, readable text format, extracting headings, paragraphs, and converting tables to Markdown.
+*   **Chunking and LangChain Document Creation**: Splits the cleaned text into smaller chunks and converts them into LangChain `Document` objects.
+*   **Embedding and Vector Store**: Uses `HuggingFaceEmbeddings` (e.g., `BAAI/bge-small-en-v1.5`) to create embeddings from the chunks and stores them in a `FAISS` vector store for efficient retrieval.
+*   **RAG Pipeline Definition**: Sets up the RAG chain using LangChain Expression Language (LCEL) with a prompt template and a HuggingFace LLM (initially `google/flan-t5-small`, then `meta-llama/Meta-Llama-3-8B-Instruct`).
+*   **Model Testing**: Demonstrates how to query the RAG pipeline and retrieve answers using both a smaller `google/flan-t5-small` model and a more powerful `meta-llama/Meta-Llama-3-8B-Instruct` model (with 4-bit quantization).
